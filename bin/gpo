@@ -60,8 +60,6 @@
     youtube URL                Resolve the YouTube URL to a download URL
     youtubefix                 Migrate old YouTube subscriptions to new feeds
     rewrite OLDURL NEWURL      Change the feed URL of [OLDURL] to [NEWURL]
-    webui [public]             Start gPodder's Web UI server
-                               (public = listen on all network interfaces)
 
 """
 
@@ -100,8 +98,7 @@ for flag in ('-v', '--verbose'):
         break
 
 gpodder_script = sys.argv[0]
-if os.path.islink(gpodder_script):
-    gpodder_script = os.readlink(gpodder_script)
+gpodder_script = os.path.realpath(gpodder_script)
 gpodder_dir = os.path.join(os.path.dirname(gpodder_script), '..')
 # TODO: Read parent directory links as well (/bin -> /usr/bin, like on Fedora, see Bug #1618)
 # This would allow /usr/share/gpodder/ (not /share/gpodder/) to be found from /bin/gpodder
@@ -122,9 +119,6 @@ gpodder.prefix = prefix
 
 # This is the command-line UI variant
 gpodder.ui.cli = True
-
-# Platform detection (i.e. MeeGo 1.2 Harmattan, etc..)
-gpodder.detect_platform()
 
 have_ansi = sys.stdout.isatty() and not gpodder.ui.win32
 interactive_console = sys.stdin.isatty() and sys.stdout.isatty()
@@ -657,18 +651,6 @@ class gPodderCli(object):
             if not reported_anything:
                 self._info(_('Nothing to fix'))
             return True
-
-
-    def webui(self, public=None):
-        from gpodder import webui
-        if public == 'public':
-            # Warn the user that the web UI is listening on all network
-            # interfaces, which could lead to problems.
-            # Only use this on a trusted, private network!
-            self._warn(_('Listening on ALL network interfaces.'))
-            webui.main(only_localhost=False, core=self.core)
-        else:
-            webui.main(core=self.core)
 
     def search(self, *terms):
         query = ' '.join(terms)

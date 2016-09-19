@@ -43,43 +43,50 @@
 # define MAIN_MODULE "bin\\gpo"
 #endif
 
-#define PYTHON_INSTALLER_FILE "python-2.7.8.msi"
-#define PYTHON_INSTALLER_SIZE 16703488L
-#define PYGTK_INSTALLER_FILE "pygtk-all-in-one-2.24.2.win32-py2.7.msi"
-#define PYGTK_INSTALLER_SIZE 33239562L
-
-#define PYTHON_INSTALLER_URL \
-    "http://python.org/ftp/python/2.7.8/" \
-    PYTHON_INSTALLER_FILE
-
-#define PYGTK_INSTALLER_URL \
-    "http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/2.24/" \
-    PYGTK_INSTALLER_FILE
-
 #define LOOKUP_FUNCTION(x) {x = GetProcAddress(python_dll, #x); \
     if(x == NULL) {BAILOUT("Cannot find function: " #x);}}
 
 
-const char *FindPythonDLL(HKEY rootKey)
+static char *
+get_python_install_path()
 {
     static char InstallPath[MAX_PATH];
     DWORD InstallPathSize = MAX_PATH;
     HKEY RegKey;
     char *result = NULL;
 
-    if (RegOpenKeyEx(rootKey,
+    /* Try to detect "just for me"-installed Python version (bug 1480) */
+    if (RegOpenKeyEx(HKEY_CURRENT_USER,
             "Software\\Python\\PythonCore\\2.7\\InstallPath",
             0, KEY_READ, &RegKey) != ERROR_SUCCESS) {
-        return NULL;
+        /* Try to detect "for all users" Python (bug 1480, comment 9) */
+        if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+                "Software\\Python\\PythonCore\\2.7\\InstallPath",
+                0, KEY_READ, &RegKey) != ERROR_SUCCESS) {
+            return NULL;
+        }
     }
 
     if (RegQueryValueEx(RegKey, NULL, NULL, NULL,
                 InstallPath, &InstallPathSize) == ERROR_SUCCESS) {
-        strncat(InstallPath, "\\python27.dll", sizeof(InstallPath));
-        result = InstallPath;
+        result = strdup(InstallPath);
     }
 
     RegCloseKey(RegKey);
+    return result;
+}
+
+char *FindPythonDLL()
+{
+    char *path = get_python_install_path();
+    if (path == NULL) {
+        return NULL;
+    }
+
+    static const char *python27_dll = "\\python27.dll";
+    char *result = malloc(strlen(path) + strlen(python27_dll) + 1);
+    sprintf(result, "%s%s", path, python27_dll);
+    free(path);
     return result;
 }
 
@@ -128,7 +135,6 @@ int main(int argc, char** argv)
     char path_env[MAX_PATH];
     char current_dir[MAX_PATH];
     char *endmarker = NULL;
-    const char *dll_path = NULL;
     const char *target_folder = NULL;
     char tmp[MAX_PATH];
     int force_select = 0;
@@ -189,18 +195,25 @@ int main(int argc, char** argv)
     SetEnvironmentVariable("PATH", new_path);
     free(new_path);
 
+    /**
+     * Workaround import issues with Python 2.7.11.
+     **/
+    if (getenv("PYTHONHOME") == NULL) {
+        char *python_home = get_python_install_path();
+        if (python_home) {
+            SetEnvironmentVariable("PYTHONHOME", python_home);
+            free(python_home);
+        }
+    }
+
     /* Only load the Python DLL after we've set up the environment */
     python_dll = LoadLibrary("python27.dll");
 
     if (python_dll == NULL) {
-        /* Try to detect "just for me"-installed Python version (bug 1480) */
-        dll_path = FindPythonDLL(HKEY_CURRENT_USER);
-        if (dll_path == NULL) {
-            /* Try to detect "for all users" Python (bug 1480, comment 9) */
-            dll_path = FindPythonDLL(HKEY_LOCAL_MACHINE);
-        }
+        char *dll_path = FindPythonDLL();
         if (dll_path != NULL) {
             python_dll = LoadLibrary(dll_path);
+            free(dll_path);
         }
     }
 

@@ -36,19 +36,14 @@ MOFILES = $(patsubst po/%.po,$(LOCALEDIR)/%/LC_MESSAGES/gpodder.mo, $(POFILES))
 
 UIFILES=$(wildcard share/gpodder/ui/gtk/*.ui)
 UIFILES_H=$(subst .ui,.ui.h,$(UIFILES))
-QMLFILES=$(wildcard share/gpodder/ui/qml/*.qml \
-                    share/gpodder/ui/qml/harmattan/org/gpodder/qmlui/*.qml)
 GETTEXT_SOURCE=$(wildcard src/gpodder/*.py \
 		          src/gpodder/gtkui/*.py \
 		          src/gpodder/gtkui/interface/*.py \
 			  src/gpodder/gtkui/desktop/*.py \
-			  src/gpodder/qmlui/*.py \
-			  src/gpodder/webui/*.py \
 			  src/gpodder/plugins/*.py \
 			  share/gpodder/extensions/*.py)
 
 GETTEXT_SOURCE += $(UIFILES_H)
-GETTEXT_SOURCE += $(QMLFILES)
 GETTEXT_SOURCE += $(wildcard bin/*)
 GETTEXT_SOURCE += $(DESKTOP_FILES_IN_H)
 
@@ -73,7 +68,7 @@ release: distclean
 
 releasetest: unittest $(DESKTOP_FILES) $(POFILES)
 	for f in $(DESKTOP_FILES); do desktop-file-validate $$f; done
-	sh tools/i18n/validate.sh
+	for f in $(POFILES); do msgfmt --check $$f; done
 
 $(GPODDER_SERVICE_FILE): $(GPODDER_SERVICE_FILE_IN)
 	sed -e 's#__PREFIX__#$(PREFIX)#' $< >$@
@@ -108,6 +103,8 @@ messages: $(MOFILES)
 
 %.po: $(MESSAGES)
 	msgmerge --silent $@ $< --output-file=$@
+	msgattrib --set-obsolete --ignore-file=$< -o $@ $@
+	msgattrib --no-obsolete -o $@ $@
 
 $(LOCALEDIR)/%/LC_MESSAGES/gpodder.mo: po/%.po
 	@mkdir -p $(@D)

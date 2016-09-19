@@ -36,18 +36,6 @@ from gpodder import util
 from gpodder.gtkui.draw import draw_text_box_centered
 
 
-try:
-    from gi.repository import WebKit
-    webview_signals = GObject.signal_list_names(WebKit.WebView)
-    if 'navigation-policy-decision-requested' in webview_signals:
-        have_webkit = True
-    else:
-        logger.warn('Your WebKit is too old (gPodder bug 1001).')
-        have_webkit = False
-except ImportError:
-    have_webkit = False
-
-
 class gPodderShownotes:
     def __init__(self, shownotes_pane):
         self.shownotes_pane = shownotes_pane
@@ -126,64 +114,50 @@ class gPodderShownotesText(gPodderShownotes):
         self.text_view.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
         self.text_view.set_border_width(10)
         self.text_view.set_editable(False)
+        self.text_view.connect('button-release-event', self.on_button_release)
+        self.text_view.connect('key-press-event', self.on_key_press)
         self.text_buffer = Gtk.TextBuffer()
         self.text_buffer.create_tag('heading', scale=1.3, weight=Pango.Weight.BOLD)
         self.text_buffer.create_tag('subheading', scale=0.9)
+        self.text_buffer.create_tag('hyperlink', foreground="#0000FF", underline=Pango.Underline.SINGLE)
         self.text_view.set_buffer(self.text_buffer)
         self.text_view.modify_bg(Gtk.StateType.NORMAL,
                 Gdk.color_parse('#ffffff'))
         return self.text_view
 
     def update(self, heading, subheading, episode):
+        hyperlinks = [(0, None)]
         self.text_buffer.set_text('')
         self.text_buffer.insert_with_tags_by_name(self.text_buffer.get_end_iter(), heading, 'heading')
         self.text_buffer.insert_at_cursor('\n')
         self.text_buffer.insert_with_tags_by_name(self.text_buffer.get_end_iter(), subheading, 'subheading')
         self.text_buffer.insert_at_cursor('\n\n')
-        self.text_buffer.insert(self.text_buffer.get_end_iter(), util.remove_html_tags(episode.description))
+        for target, text in util.extract_hyperlinked_text(episode.description):
+            hyperlinks.append((self.text_buffer.get_char_count(), target))
+            if target:
+                self.text_buffer.insert_with_tags_by_name(
+                    self.text_buffer.get_end_iter(), text, 'hyperlink')
+            else:
+                self.text_buffer.insert(
+                    self.text_buffer.get_end_iter(), text)
+        hyperlinks.append((self.text_buffer.get_char_count(), None))
+        self.hyperlinks = [(start, end, url) for (start, url), (end, _) in zip(hyperlinks, hyperlinks[1:]) if url]
         self.text_buffer.place_cursor(self.text_buffer.get_start_iter())
 
+    def on_button_release(self, widget, event):
+        if event.button == 1:
+            self.activate_links()
 
-class gPodderShownotesHTML(gPodderShownotes):
-    SHOWNOTES_HTML_TEMPLATE = """
-    <html>
-      <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-      </head>
-      <body>
-        <span style="font-size: big; font-weight: bold;">%s</span>
-        <br>
-        <span style="font-size: small;">%s (%s)</span>
-        <hr style="border: 1px #eeeeee solid;">
-        <p>%s</p>
-      </body>
-    </html>
-    """
+    def on_key_press(self, widget, event):
+        if event.keyval == Gdk.KEY_Return:
+            self.activate_links()
+            return True
 
-    def init(self):
-        self.html_view = WebKit.WebView()
-        self.html_view.connect('navigation-policy-decision-requested',
-                self._navigation_policy_decision)
-        self.html_view.load_html_string('', '')
-        return self.html_view
+        return False
 
-    def _navigation_policy_decision(self, wv, fr, req, action, decision):
-        REASON_LINK_CLICKED, REASON_OTHER = 0, 5
-        if action.get_reason() == REASON_LINK_CLICKED:
-            util.open_website(req.get_uri())
-            decision.ignore()
-        elif action.get_reason() == REASON_OTHER:
-            decision.use()
-        else:
-            decision.ignore()
-
-    def update(self, heading, subheading, episode):
-        html = self.SHOWNOTES_HTML_TEMPLATE % (
-                cgi.escape(heading),
-                cgi.escape(subheading),
-                episode.get_play_info_string(),
-                episode.description_html,
-        )
-        url = os.path.dirname(episode.channel.url)
-        self.html_view.load_html_string(html, url)
-
+    def activate_links(self):
+        if self.text_buffer.get_selection_bounds() == ():
+            pos = self.text_buffer.props.cursor_position
+            target = next((url for start, end, url in self.hyperlinks if start < pos < end), None)
+            if target is not None:
+                util.open_website(target)

@@ -307,38 +307,6 @@ def cairo_surface_to_pixbuf(s):
     return pixbuf
 
 
-def draw_flattr_button(widget, flattr_image, flattrs_count):
-    """
-    Adds the flattrs count to the flattr button
-    """
-    if isinstance(flattrs_count, int):
-        flattrs_count = str(flattrs_count)
-
-    pixbuf = GdkPixbuf.Pixbuf.new_from_file(flattr_image)
-    iwidth, iheight = pixbuf.get_width(), pixbuf.get_height()
-    pixmap, mask = pixbuf.render_pixmap_and_mask()
-
-    # get default-font
-    style_context = widget.get_style_context()
-    font_desc = style.get_font(Gtk.StateFlags.NORMAL)
-    #font_desc.set_size(12*Pango.SCALE)
-    font_desc.set_size(9*Pango.SCALE)
-
-    # set font and text
-    layout = widget.create_pango_layout(flattrs_count)
-    layout.set_font_description(font_desc)
-    fwidth, fheight = layout.get_pixel_size()
-
-    x = 95 - abs(fwidth / 2) # 95 is the center of the bubble
-    y = abs(iheight / 2) - abs(fheight / 2)
-
-    cm = pixmap.get_colormap()
-    red = cm.alloc_color('black')
-    gc = pixmap.new_gc(foreground=red)
-    pixmap.draw_layout(gc, x, y, layout)
-    widget.set_from_pixmap(pixmap, mask)
-
-
 def progressbar_pixbuf(width, height, percentage):
     COLOR_BG = (.4, .4, .4, .4)
     COLOR_FG = (.2, .9, .2, 1.)

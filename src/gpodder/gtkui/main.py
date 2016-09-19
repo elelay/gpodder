@@ -19,6 +19,8 @@
 
 import os
 import platform
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
@@ -84,7 +86,6 @@ from gpodder.gtkui.desktop.podcastdirectory import gPodderPodcastDirectory
 from gpodder.gtkui.interface.progress import ProgressIndicator
 
 from gpodder.gtkui.desktop.sync import gPodderSyncUI
-from gpodder.gtkui import flattr
 from gpodder.gtkui import shownotes
 
 from gpodder.dbusproxy import DBusPodcastsProxy
@@ -118,7 +119,6 @@ class gPodder(BuilderWidget, dbus.service.Object):
         self.config = self.core.config
         self.db = self.core.db
         self.model = self.core.model
-        self.flattr = self.core.flattr
         self.options = options
         BuilderWidget.__init__(self, None)
 
@@ -145,10 +145,7 @@ class gPodder(BuilderWidget, dbus.service.Object):
         self.config.add_observer(self.on_config_changed)
 
         self.shownotes_pane = Gtk.HBox()
-        if shownotes.have_webkit and self.config.enable_html_shownotes:
-            self.shownotes_object = shownotes.gPodderShownotesHTML(self.shownotes_pane)
-        else:
-            self.shownotes_object = shownotes.gPodderShownotesText(self.shownotes_pane)
+        self.shownotes_object = shownotes.gPodderShownotesText(self.shownotes_pane)
 
         # Vertical paned for the episode list and shownotes
         self.vpaned = Gtk.VPaned()
@@ -1403,6 +1400,7 @@ class gPodder(BuilderWidget, dbus.service.Object):
 
         # Update icon list to show changes, if any
         self.update_episode_list_icons(all=True)
+        self.update_podcast_list_model()
 
 
     def format_episode_list(self, episode_list, max_episodes=10):
@@ -1694,7 +1692,6 @@ class gPodder(BuilderWidget, dbus.service.Object):
             episodes = self.get_selected_episodes()
             any_locked = any(e.archive for e in episodes)
             any_new = any(e.is_new for e in episodes)
-            any_flattrable = any(e.payment_url for e in episodes)
             downloaded = all(e.was_downloaded(and_exists=True) for e in episodes)
             downloading = any(e.downloading for e in episodes)
 
@@ -1780,12 +1777,6 @@ class gPodder(BuilderWidget, dbus.service.Object):
                 item = Gtk.CheckMenuItem(_('Archive'))
                 item.set_active(any_locked)
                 item.connect('activate', lambda w: self.on_item_toggle_lock_activate( w, False, not any_locked))
-                menu.append(item)
-
-            if any_flattrable and self.config.flattr.token:
-                menu.append(Gtk.SeparatorMenuItem())
-                item = Gtk.MenuItem(_('Flattr this'))
-                item.connect('activate', self.flattr_selected_episodes)
                 menu.append(item)
 
             menu.append(Gtk.SeparatorMenuItem())
@@ -1912,13 +1903,6 @@ class gPodder(BuilderWidget, dbus.service.Object):
                     continue # This file was handled by the D-Bus call
                 except Exception, e:
                     logger.error('Calling Panucci using D-Bus', exc_info=True)
-
-            # flattr episode if auto-flattr is enabled
-            if (episode.payment_url and self.config.flattr.token and
-                    self.config.flattr.flattr_on_play):
-                success, message = self.flattr.flattr_url(episode.payment_url)
-                self.show_message(message, title=_('Flattr status'),
-                        important=not success)
 
             groups[player].append(filename)
 
@@ -2116,6 +2100,8 @@ class gPodder(BuilderWidget, dbus.service.Object):
         pass # XXX: Remove?
 
     def update_episode_list_model(self):
+        if not hasattr(self, 'episode_list_model'):
+            return
         if self.channels and self.active_channel is not None:
             self.currently_updating = True
             self.episode_list_model.clear()
@@ -2676,15 +2662,6 @@ class gPodder(BuilderWidget, dbus.service.Object):
             episode.mark_old()
         self.on_selected_episodes_status_changed()
 
-    def flattr_selected_episodes(self, w=None):
-        if not self.config.flattr.token:
-            return
-
-        for episode in [e for e in self.get_selected_episodes() if e.payment_url]:
-            success, message = self.flattr.flattr_url(episode.payment_url)
-            self.show_message(message, title=_('Flattr status'),
-                important=not success)
-
     def on_item_toggle_played_activate( self, widget, toggle = True, new_value = False):
         for episode in self.get_selected_episodes():
             if toggle:
@@ -2899,7 +2876,6 @@ class gPodder(BuilderWidget, dbus.service.Object):
     def on_itemPreferences_activate(self, widget, *args):
         gPodderPreferences(self.main_window, \
                 _config=self.config, \
-                flattr=self.flattr, \
                 user_apps_reader=self.user_apps_reader, \
                 parent_window=self.main_window, \
                 mygpo_client=self.mygpo_client, \
@@ -2955,8 +2931,7 @@ class gPodder(BuilderWidget, dbus.service.Object):
                 cover_downloader=self.cover_downloader,
                 sections=set(c.section for c in self.channels),
                 clear_cover_cache=self.podcast_list_model.clear_cover_cache,
-                _config=self.config,
-                _flattr=self.flattr)
+                _config=self.config)
 
     def on_itemMassUnsubscribe_activate(self, item=None):
         columns = (
@@ -3125,7 +3100,16 @@ class gPodder(BuilderWidget, dbus.service.Object):
         If silent=False, a message will be shown even if no updates are
         available (set silent=False when the check is manually triggered).
         """
-        up_to_date, version, released, days = util.get_update_info()
+        try:
+            up_to_date, version, released, days = util.get_update_info()
+        except Exception as e:
+            if silent:
+                logger.warn('Could not check for updates.', exc_info=True)
+            else:
+                title = _('Could not check for updates')
+                message = _('Please try again later.')
+                self.show_message(message, title, important=True)
+            return
 
         if up_to_date and not silent:
             title = _('No updates available')
@@ -3157,73 +3141,39 @@ class gPodder(BuilderWidget, dbus.service.Object):
         dlg.add_button(Gtk.STOCK_CLOSE, Gtk.ResponseType.OK).show()
         dlg.set_resizable(False)
 
-        bg = Gtk.HBox(spacing=10)
-        bg.pack_start(Gtk.image_new_from_file(gpodder.icon_file, True, True, 0), expand=False)
+        bg = Gtk.HBox(spacing=6)
+        pb = Gdk.pixbuf_new_from_file_at_size(gpodder.icon_file, 160, 160)
+        bg.pack_start(Gtk.image_new_from_pixbuf(pb), expand=False)
         vb = Gtk.VBox()
         vb.set_spacing(6)
         label = Gtk.Label()
-        label.set_alignment(0, 1)
-        label.set_markup('<b><big>gPodder</big> %s</b>' % gpodder.__version__)
-        vb.pack_start(label, True, True, 0)
-        label = Gtk.Label()
-        label.set_alignment(0, 0)
-        label.set_markup('<small><a href="%s">%s</a></small>' % \
-                ((cgi.escape(gpodder.__url__),)*2))
-        vb.pack_start(label, True, True, 0)
-        bg.pack_start(vb, True, True, 0)
+        label.set_alignment(0, 0.5)
+        label.set_markup('\n'.join(x.strip() for x in """
+        <b>gPodder {version} ({date})</b>
+        <i>"{relname}"</i>
 
-        out = Gtk.VBox(spacing=10)
-        out.set_border_width(12)
-        out.pack_start(bg, False, True, 0)
-        out.pack_start(Gtk.HSeparator(True, True, 0))
-        out.pack_start(Gtk.Label(gpodder.__copyright__, True, True, 0))
+        {copyright}
+        License: {license}
 
-        button_box = Gtk.HButtonBox()
-        button = Gtk.Button(_('Donate / Wishlist'))
-        button.connect('clicked', self.on_item_support_activate)
-        button_box.pack_start(button, True, True, 0)
-        button = Gtk.Button(_('Report a problem'))
-        button.connect('clicked', self.on_bug_tracker_activate)
-        button_box.pack_start(button, True, True, 0)
-        out.pack_start(button_box, False, True, 0)
+        <a href="{url}">Website</a> · <a href="{donate_url}">Donate</a> · <a href="{bugs_url}">Bug Tracker</a>
+        """.format(version=gpodder.__version__,
+                   date=gpodder.__date__,
+                   relname=gpodder.__relname__,
+                   copyright=gpodder.__copyright__,
+                   license=gpodder.__license__,
+                   donate_url='http://gpodder.org/donate',
+                   bugs_url='https://bugs.gpodder.org/',
+                   url=cgi.escape(gpodder.__url__)).strip().split('\n')))
 
-        credits = Gtk.TextView()
-        credits.set_left_margin(5)
-        credits.set_right_margin(5)
-        credits.set_pixels_above_lines(5)
-        credits.set_pixels_below_lines(5)
-        credits.set_editable(False)
-        credits.set_cursor_visible(False)
-        sw = Gtk.ScrolledWindow()
-        sw.set_shadow_type(Gtk.ShadowType.IN)
-        sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        sw.add(credits)
-        credits.set_size_request(-1, 160)
-        out.pack_start(sw, expand=True, fill=True)
+        vb.pack_start(label)
+        bg.pack_start(vb)
+        bg.pack_start(Gtk.Label())
 
-        dlg.vbox.pack_start(out, False, True, 0)
+        dlg.vbox.pack_start(bg, expand=False)
         dlg.connect('response', lambda dlg, response: dlg.destroy())
 
         dlg.vbox.show_all()
 
-        if os.path.exists(gpodder.credits_file):
-            credits_txt = open(gpodder.credits_file).read().strip().split('\n')
-            translator_credits = _('translator-credits')
-            if translator_credits != 'translator-credits':
-                app_authors = [_('Translation by:'), translator_credits, '']
-            else:
-                app_authors = []
-
-            app_authors += [_('Thanks to:')]
-            app_authors += credits_txt
-
-            buffer = Gtk.TextBuffer()
-            buffer.set_text('\n'.join(app_authors))
-            credits.set_buffer(buffer)
-        else:
-            sw.hide()
-
-        credits.grab_focus()
         dlg.run()
 
     def on_wNotebook_switch_page(self, notebook, page, page_num):
@@ -3451,8 +3401,7 @@ class gPodder(BuilderWidget, dbus.service.Object):
         self.sync_ui = gPodderSyncUI(self.config, self.notification,
                 self.main_window,
                 self.show_confirmation,
-                self.update_episode_list_icons,
-                self.update_podcast_list_model,
+                self.toolPreferences,
                 self.channels,
                 self.download_status_model,
                 self.download_queue_manager,

@@ -32,7 +32,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 try:
+    import gi
+    gi.require_version('Notify', '0.7')
     from gi.repository import Notify
+    pynotify = True
 except ImportError:
     pynotify = None
 

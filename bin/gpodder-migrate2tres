@@ -31,8 +31,7 @@ import ConfigParser
 import shutil
 
 gpodder_script = sys.argv[0]
-if os.path.islink(gpodder_script):
-    gpodder_script = os.readlink(gpodder_script)
+gpodder_script = os.path.realpath(gpodder_script)
 gpodder_dir = os.path.join(os.path.dirname(gpodder_script), '..')
 prefix = os.path.abspath(os.path.normpath(gpodder_dir))
 
@@ -45,9 +44,6 @@ if os.path.exists(os.path.join(src_dir, 'gpodder', '__init__.py')):
 import gpodder
 
 gpodder.prefix = prefix
-
-# Platform detection (i.e. MeeGo 1.2 Harmattan, etc..)
-gpodder.detect_platform()
 
 
 from gpodder import schema

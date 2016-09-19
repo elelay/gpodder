@@ -30,22 +30,17 @@
 
  [ DEPENDENCIES ]
 
-    - Python 2.6 or newer              http://python.org/
-    - "sqlite3" Python module          (usually included with Python)
+    - Python 2.7 or newer              http://python.org/
     - Feedparser 5.1.2 or newer        http://code.google.com/p/feedparser/
-    - mygpoclient 1.7 or newer         http://thp.io/2010/mygpoclient/
+    - mygpoclient 1.7 or newer         http://gpodder.org/mygpoclient/
     - Python D-Bus bindings
-
-    gPodder might still work with Python 2.5, but you may need to
-    install the json module ("simplejson") manually. We reserve the
-    right to drop support for Python 2.5 in future point releases.
 
     As an alternative to python-dbus on Mac OS X and Windows, you can use
     the dummy (no-op) D-Bus module provided in "tools/fake-dbus-module/".
 
     For quick testing, you can use the script tools/localdepends.py to
     install local copies of feedparser and mygpoclient into "src/" from
-    PyPI. With this, you get a self-contained gPodder CLI/WebUI codebase.
+    PyPI. With this, you get a self-contained gPodder CLI codebase.
 
 
  [ GTK UI - ADDITIONAL DEPENDENCIES ]
@@ -53,37 +48,14 @@
     - PyGTK 2.16 or newer              http://pygtk.org/
 
 
- [ QML UI - ADDITIONAL DEPENDENCIES ]
-
-    - Qt 4.7.1 or newer                http://qt.nokia.com/
-    - PySide 1.0.8 or newer            http://www.pyside.org/
-    - Qt Mobility 1.2 or newer         http://qt.gitorious.org/qt-mobility
-    - Qt Quick Components              http://qt.gitorious.org/qt-components
-
-    The QML UI depends on the QtMultimediaKit QML bindings for playing
-    back audio (libdeclarative-multimedia in Debian) and on the WebKit QML
-    bindings for Flattr integration (libqtwebkit-qmlwebkitplugin in Debian).
-
-    The QML UI now also depends on Qt Quick Components. On MeeGo 1.2 Harmattan,
-    these components are pre-installed. You can install them on your Desktop by
-    checking out the code from the qt-components Git repository and running the
-    "./configure" script with the "-meego" parameter (+ the usual make install).
-
-    You might also need to copy the theme from /usr/share/themes/blanco/ on a
-    MeeGo 1.2 Harmattan device to your development machine in order for all UI
-    elements to be displayed correctly. Alternatively, you can use the free
-    "darko" theme from: https://github.com/jpavelek/meego-handset-theme-darko
-
-
  [ OPTIONAL DEPENDENCIES ]
 
     - Bluetooth file sending: gnome-obex-send or bluetooth-sendto
-    - HTML shownotes: python-webkit
-    - Flattr integration: python-webkit
     - Size detection on Windows: PyWin32
     - Native OS X support: ige-mac-integration
     - MP3 Player Sync Support: python-eyed3 (0.7 or newer)
     - iPod Sync Support: python-gpod
+    - Clickable links in GTK UI show notes: html5lib
 
 
  [ BUILD DEPENDENCIES ]
@@ -134,7 +106,6 @@
     To run gPodder from source, use..
 
         bin/gpodder              for the Gtk+ UI
-        bin/gpodder --qml        for the QML UI
         bin/gpo                  for the command-line interface
 
     To install gPodder system-wide, use "make install". By default, this
@@ -161,25 +132,7 @@
 
  [ PYTHON 3 SUPPORT ]
 
-    The CLI version of gPodder (bin/gpo) and the QML UI are compatible with
-    Python 3 after converting the codebase with the 2to3 utility:
-
-      2to3 -w bin/* src share/gpodder/extensions
-
-    You will also need a copy of "mygpoclient" converted using 2to3 and
-    a copy of "feedparser" converted using 2to3 (see the feedparser README
-    for details on how to get it set up on Python 3, including sgmllib).
-
-    Please note that the Gtk UI is not compatible with Python 3 (it will
-    be once we migrate the codebase to Gtk3/GObject Introspection).
-
-    The QML UI has been tested with PySide (Git revision a90f3bc) and
-    Python 3.2.2 - you can use the PySide buildscripts to build PySide:
-
-        http://github.com/PySide/BuildScripts
-
-    As of February 2012, Python 3 support is still experimental. Please
-    report any bugs that you find to the gPodder bug tracker (see below).
+    For Python 3 support, we recommend you use gPodder 4.x for now.
 
 
  [ PORTABLE MODE / ROAMING PROFILES ]
@@ -191,6 +144,19 @@
     download directory directly on a MP3 player or USB disk:
 
         export GPODDER_HOME=/media/usbdisk/gpodder-data/
+
+		
+	OS X Specific Notes 
+	
+		default GPODDER_HOME="$HOME/Library/Application Support/gPodder"
+		default GPODDER_DOWNLOAD_DIR="$HOME/Library/Application Support/gPodder/download"
+
+		These settings may be modified by editing the following file of the .app : 
+			/Applications/gPodder.app/Contents/MacOSX/_launcher
+			
+		Add and edit the following lines to alter the launch enviroment on OS X : 
+			export GPODDER_HOME="$HOME/Library/Application Support/gPodder"
+			export GPODDER_DOWNLOAD_DIR="$HOME/Library/Application Support/gPodder/download"
 
 
  [ CHANGING THE DOWNLOAD DIRECTORY ]
@@ -241,32 +207,6 @@
     check if the bug still appears to see if an extension causes the bug.
 
 
- [ TRANSLATIONS ]
-
-    These instructions are mostly useful for the maintainer, but they are
-    documented here in case you want to update translations yourself:
-
-    To upload a changed translation template:
-
-        make messages       # update translations from source
-        make clean          # remove temporary files after "make messages"
-        tx push --source    # upload po/messages.pot to transifex.net
-
-    To download a translation that has been updated:
-
-        tx pull -l XX -f    # download po/XX.po from transifex.net
-
-    To generate Git commit commands for the translation updates:
-
-        python tools/i18n/generate_commits.py
-
-    The "tx" command is provided by the Transifex client (transifex-client
-    in Debian/Ubuntu) which can be obtained from:
-
-        http://help.transifex.com/features/client/
-
-
-
  [ MORE INFORMATION ]
 
     - Homepage                         http://gpodder.org/
@@ -275,5 +215,5 @@
     - IRC channel                      #gpodder on irc.freenode.net
 
   ............................................................................
-             Last updated: 2013-02-12 by Thomas Perl <thp.io/about>
+             Last updated: 2016-09-17 by Thomas Perl <thp.io/about>
 

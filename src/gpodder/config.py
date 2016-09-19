@@ -104,15 +104,6 @@ defaults = {
             'colors': True,
         },
 
-        # Settings for the QML UI (MeeGo Harmattan / N9)
-        'qml': {
-            'state': {
-                'episode_list_filter': 0,
-            },
-
-            'autorotate': False,
-        },
-
         # Settings for the Gtk UI
         'gtk': {
             'state': {
@@ -137,7 +128,6 @@ defaults = {
             },
 
             'toolbar': False,
-            'html_shownotes': True,
             'new_episodes': 'show', # ignore, show, queue, download
             'live_search_delay': 200,
 
@@ -201,11 +191,6 @@ defaults = {
     'extensions': {
         'enabled': [],
     },
-
-    'flattr': {
-        'token': '',
-        'flattr_on_play': False,
-    },
 }
 
 # The sooner this goes away, the better
@@ -225,7 +210,6 @@ gPodderSettings_LegacySupport = {
     'episode_list_descriptions': 'ui.gtk.episode_list.descriptions',
     'podcast_list_view_all': 'ui.gtk.podcast_list.all_episodes',
     'podcast_list_sections': 'ui.gtk.podcast_list.sections',
-    'enable_html_shownotes': 'ui.gtk.html_shownotes',
     'episode_list_view_mode': 'ui.gtk.episode_list.view_mode',
     'podcast_list_view_mode': 'ui.gtk.podcast_list.view_mode',
     'podcast_list_hide_boring': 'ui.gtk.podcast_list.hide_empty',
