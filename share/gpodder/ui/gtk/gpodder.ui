@@ -428,9 +428,10 @@
           </packing>
         </child>
                             <child>
-                              <object class="GtkHBox" id="hboxUpdateFeeds">
+                              <object class="GtkBox" id="hboxUpdateFeeds">
                                 <property name="homogeneous">False</property>
                                 <property name="spacing">6</property>
+                                <property name="orientation">horizontal</property>
                                 <child>
                                   <object class="GtkProgressBar" id="pbFeedUpdate">
                                     <property name="pulse_step">0.10000000149</property>
@@ -483,9 +484,10 @@
       </object>
     </child>
     <child>
-      <object class="GtkVBox" id="vMain">
+      <object class="GtkBox" id="vMain">
         <property name="visible">True</property>
         <property name="homogeneous">False</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkMenuBar" constructor="uimanager1" id="mainMenu">
             <property name="visible">False</property>
@@ -499,10 +501,11 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="hboxContainer">
+          <object class="GtkBox" id="hboxContainer">
             <property name="border_width">0</property>
             <property name="visible">True</property>
             <property name="homogeneous">False</property>
+            <property name="orientation">horizontal</property>
             <child>
               <object class="GtkStack" id="wNotebook">
                 <property name="visible">True</property>
@@ -514,10 +517,11 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <child>
-                      <object class="GtkVBox" id="vboxChannelNavigator">
+                      <object class="GtkBox" id="vboxChannelNavigator">
                         <property name="visible">True</property>
                         <property name="homogeneous">False</property>
                         <property name="spacing">5</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkScrolledWindow" id="scrolledwindow6">
                             <property name="visible">True</property>
@@ -553,8 +557,9 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkHBox" id="hbox_search_podcasts">
+                          <object class="GtkBox" id="hbox_search_podcasts">
                             <property name="spacing">6</property>
+                            <property name="orientation">horizontal</property>
                             <child>
                               <object class="GtkEntry" id="entry_search_podcasts">
                                 <property name="visible">True</property>
@@ -577,9 +582,10 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbox_episode_list">
+                      <object class="GtkBox" id="vbox_episode_list">
                         <property name="visible">True</property>
                         <property name="spacing">6</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkScrolledWindow" id="scrollAvailable">
                             <property name="visible">True</property>
@@ -614,8 +620,9 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkHBox" id="hbox_search_episodes">
+                          <object class="GtkBox" id="hbox_search_episodes">
                             <property name="spacing">6</property>
+                            <property name="orientation">horizontal</property>
                             <child>
                               <object class="GtkLabel" id="label_search_episodes">
                                 <property name="visible">True</property>
@@ -653,11 +660,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkVBox" id="vboxDownloadStatusWidgets">
+                  <object class="GtkBox" id="vboxDownloadStatusWidgets">
                     <property name="border_width">0</property>
                     <property name="visible">True</property>
                     <property name="homogeneous">False</property>
                     <property name="spacing">5</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkScrolledWindow" id="scrolledwindow1">
                         <property name="visible">True</property>
@@ -691,14 +699,16 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkHBox" id="hboxDownloadSettings">
+                      <object class="GtkBox" id="hboxDownloadSettings">
                         <property name="border_width">5</property>
                         <property name="visible">True</property>
                         <property name="spacing">10</property>
+                        <property name="orientation">horizontal</property>
                         <child>
-                          <object class="GtkHBox" id="hboxDownloadLimit">
+                          <object class="GtkBox" id="hboxDownloadLimit">
                             <property name="visible">True</property>
                             <property name="spacing">5</property>
+                            <property name="orientation">horizontal</property>
                             <child>
                               <object class="GtkCheckButton" id="cbLimitDownloads">
                                 <property name="label" translatable="yes">Limit rate to</property>
@@ -749,9 +759,10 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkHBox" id="hboxDownloadRate">
+                          <object class="GtkBox" id="hboxDownloadRate">
                             <property name="visible">True</property>
                             <property name="spacing">5</property>
+                            <property name="orientation">horizontal</property>
                             <child>
                               <object class="GtkCheckButton" id="cbMaxDownloads">
                                 <property name="label" translatable="yes">Limit downloads to</property>

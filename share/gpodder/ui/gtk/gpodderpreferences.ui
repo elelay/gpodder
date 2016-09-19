@@ -35,18 +35,20 @@
     <property name="type_hint">dialog</property>
     <signal name="destroy" handler="on_dialog_destroy"/>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="vbox">
+      <object class="GtkBox" id="vbox">
         <property name="border_width">2</property>
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkNotebook" id="notebook">
             <property name="border_width">6</property>
             <property name="visible">True</property>
             <child>
-              <object class="GtkVBox" id="vbox_general">
+              <object class="GtkBox" id="vbox_general">
                 <property name="border_width">12</property>
                 <property name="spacing">6</property>
                 <property name="visible">True</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkTable" id="table_players">
                     <property name="column_spacing">6</property>
@@ -174,10 +176,11 @@
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="vbox_video">
+              <object class="GtkBox" id="vbox_video">
                 <property name="border_width">12</property>
                 <property name="spacing">6</property>
                 <property name="visible">True</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkTable" id="table_video">
                     <property name="column_spacing">6</property>
@@ -295,17 +298,18 @@
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="vbox_extensions">
+              <object class="GtkBox" id="vbox_extensions">
                 <property name="border_width">12</property>
                 <property name="spacing">6</property>
                 <property name="visible">True</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkScrolledWindow" id="scrolledwindow2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="shadow_type">in</property>
-		    <property name="hscrollbar-policy">GTK_POLICY_AUTOMATIC</property>
-		    <property name="vscrollbar-policy">GTK_POLICY_AUTOMATIC</property>
+                    <property name="hscrollbar-policy">GTK_POLICY_AUTOMATIC</property>
+                    <property name="vscrollbar-policy">GTK_POLICY_AUTOMATIC</property>
                     <child>
                       <object class="GtkTreeView" id="treeviewExtensions">
                         <property name="visible">True</property>
@@ -346,7 +350,7 @@
                     <property name="bottom_attach">2</property>
                     <property name="right_attach">3</property>
                     <property name="top_attach">1</property>
-		    <property name="y_options"></property>
+                    <property name="y_options"></property>
                   </packing>
                 </child>
                 <child>
@@ -359,7 +363,7 @@
                     <property name="bottom_attach">3</property>
                     <property name="top_attach">2</property>
                     <property name="x_options">fill</property>
-		    <property name="y_options"></property>
+                    <property name="y_options"></property>
                   </packing>
                 </child>
                 <child>
@@ -372,7 +376,7 @@
                     <property name="bottom_attach">4</property>
                     <property name="top_attach">3</property>
                     <property name="x_options">fill</property>
-		    <property name="y_options"></property>
+                    <property name="y_options"></property>
                   </packing>
                 </child>
                 <child>
@@ -385,7 +389,7 @@
                     <property name="bottom_attach">6</property>
                     <property name="right_attach">3</property>
                     <property name="top_attach">5</property>
-		    <property name="y_options"></property>
+                    <property name="y_options"></property>
                   </packing>
                 </child>
                 <child>
@@ -398,7 +402,7 @@
                     <property name="bottom_attach">5</property>
                     <property name="top_attach">4</property>
                     <property name="x_options">fill</property>
-		    <property name="y_options"></property>
+                    <property name="y_options"></property>
                   </packing>
                 </child>
                 <child>
@@ -411,7 +415,7 @@
                     <property name="left_attach">1</property>
                     <property name="right_attach">3</property>
                     <property name="top_attach">2</property>
-		    <property name="y_options"></property>
+                    <property name="y_options"></property>
                   </packing>
                 </child>
                 <child>
@@ -426,7 +430,7 @@
                     <property name="left_attach">1</property>
                     <property name="right_attach">3</property>
                     <property name="top_attach">3</property>
-		    <property name="y_options"></property>
+                    <property name="y_options"></property>
                   </packing>
                 </child>
                 <child>
@@ -439,7 +443,7 @@
                     <property name="left_attach">1</property>
                     <property name="right_attach">3</property>
                     <property name="top_attach">4</property>
-		    <property name="y_options"></property>
+                    <property name="y_options"></property>
                   </packing>
                 </child>
               </object>
@@ -450,14 +454,16 @@
             </child>
 
             <child>
-              <object class="GtkVBox" id="vbox_updating">
+              <object class="GtkBox" id="vbox_updating">
                 <property name="border_width">12</property>
                 <property name="spacing">6</property>
                 <property name="visible">True</property>
+                <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkHBox" id="hbox_updating_interval">
+                  <object class="GtkBox" id="hbox_updating_interval">
                     <property name="spacing">6</property>
                     <property name="visible">True</property>
+                    <property name="orientation">horizontal</property>
                     <child>
                       <object class="GtkLabel" id="label_update_interval">
                         <property name="label" translatable="yes">Update interval:</property>
@@ -499,9 +505,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="hbox_episode_limit">
+                  <object class="GtkBox" id="hbox_episode_limit">
                     <property name="spacing">6</property>
                     <property name="visible">True</property>
+                    <property name="orientation">horizontal</property>
                     <child>
                       <object class="GtkLabel" id="label_episode_limit">
                         <property name="label" translatable="yes">Maximum number of episodes per podcast:</property>
@@ -538,9 +545,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="hbox_auto_download">
+                  <object class="GtkBox" id="hbox_auto_download">
                     <property name="spacing">6</property>
                     <property name="visible">True</property>
+                    <property name="orientation">horizontal</property>
                     <child>
                       <object class="GtkLabel" id="label_auto_download">
                         <property name="label" translatable="yes">When new episodes are found:</property>
@@ -573,14 +581,16 @@
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="vbox_downloads">
+              <object class="GtkBox" id="vbox_downloads">
                 <property name="border_width">12</property>
                 <property name="spacing">6</property>
                 <property name="visible">True</property>
+                <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkHBox" id="hbox_expiration">
+                  <object class="GtkBox" id="hbox_expiration">
                     <property name="spacing">6</property>
                     <property name="visible">True</property>
+                    <property name="orientation">horizontal</property>
                     <child>
                       <object class="GtkLabel" id="label_expiration">
                         <property name="label" translatable="yes">Delete played episodes:</property>
@@ -638,10 +648,11 @@
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="vbox_devices">
+              <object class="GtkBox" id="vbox_devices">
                 <property name="visible">True</property>
                 <property name="border_width">12</property>
                 <property name="spacing">6</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkTable" id="table_devices">
                     <property name="visible">True</property>
@@ -770,22 +781,22 @@
                         <property name="y_options"></property>
                       </packing>
                     </child>
-	                <child>
-	                  <object class="GtkCheckButton" id="checkbutton_delete_using_playlists">
-	                    <property name="label" translatable="yes">Remove episodes deleted on device from gPodder</property>
-	                    <property name="visible">True</property>
-	                    <property name="can_focus">True</property>
-	                    <property name="receives_default">False</property>
-	                    <property name="draw_indicator">True</property>
-	                  </object>
-	                  <packing>
+                    <child>
+                      <object class="GtkCheckButton" id="checkbutton_delete_using_playlists">
+                        <property name="label" translatable="yes">Remove episodes deleted on device from gPodder</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
                         <property name="left_attach">0</property>
                         <property name="right_attach">2</property>
                         <property name="top_attach">4</property>
                         <property name="bottom_attach">5</property>
                         <property name="y_options"></property>
-	                  </packing>
-	                </child>
+                      </packing>
+                    </child>
 
                   </object>
                   <packing>
