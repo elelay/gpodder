@@ -46,13 +46,14 @@ class BuilderWidget(GtkBuilderWidget):
         if parent is not None:
             self.main_window.set_transient_for(parent)
 
-            if hasattr(self, 'center_on_widget'):
-                (x, y) = parent.get_position()
-                a = self.center_on_widget.allocation
-                (x, y) = (x + a.x, y + a.y)
-                (w, h) = (a.width, a.height)
-                (pw, ph) = self.main_window.get_size()
-                self.main_window.move(x + w/2 - pw/2, y + h/2 - ph/2)
+            # ELL: how to get allocation in gtk3?
+            #if hasattr(self, 'center_on_widget'):
+            #    (x, y) = parent.get_position()
+            #    a = self.center_on_widget.allocation
+            #    (x, y) = (x + a.x, y + a.y)
+            #    (w, h) = (a.width, a.height)
+            #    (pw, ph) = self.main_window.get_size()
+            #    self.main_window.move(x + w/2 - pw/2, y + h/2 - ph/2)
 
     def _on_window_state_event_iconified(self, widget, event):
         if event.new_window_state & Gdk.WindowState.ICONIFIED:
