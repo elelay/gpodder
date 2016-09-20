@@ -29,7 +29,7 @@ import tokenize
 from gi.repository import Gtk
 
 class GtkBuilderWidget(object):
-    def __init__(self, ui_folders, textdomain, **kwargs):
+    def __init__(self, parent, ui_folders, textdomain, **kwargs):
         """
         Loads the UI file from the specified folder (with translations
         from the textdomain) and initializes attributes.
@@ -65,6 +65,17 @@ class GtkBuilderWidget(object):
 
         self.builder.connect_signals(self)
         self.set_attributes()
+
+        if parent is not None:
+            self.main_window.set_transient_for(parent)
+            # ELL: how to get allocation in gtk3?
+            #if hasattr(self, 'center_on_widget'):
+            #    (x, y) = parent.get_position()
+            #    a = self.center_on_widget.allocation
+            #    (x, y) = (x + a.x, y + a.y)
+            #    (w, h) = (a.width, a.height)
+            #    (pw, ph) = self.main_window.get_size()
+            #    self.main_window.move(x + w/2 - pw/2, y + h/2 - ph/2)
 
         self.new()
 

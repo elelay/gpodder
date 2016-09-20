@@ -36,24 +36,13 @@ class BuilderWidget(GtkBuilderWidget):
     def __init__(self, parent, **kwargs):
         self._window_iconified = False
 
-        GtkBuilderWidget.__init__(self, gpodder.ui_folders, gpodder.textdomain, **kwargs)
+        GtkBuilderWidget.__init__(self, parent, gpodder.ui_folders, gpodder.textdomain, **kwargs)
 
         # Enable support for tracking iconified state
         if hasattr(self, 'on_iconify') and hasattr(self, 'on_uniconify'):
             self.main_window.connect('window-state-event', \
                     self._on_window_state_event_iconified)
 
-        if parent is not None:
-            self.main_window.set_transient_for(parent)
-
-            # ELL: how to get allocation in gtk3?
-            #if hasattr(self, 'center_on_widget'):
-            #    (x, y) = parent.get_position()
-            #    a = self.center_on_widget.allocation
-            #    (x, y) = (x + a.x, y + a.y)
-            #    (w, h) = (a.width, a.height)
-            #    (pw, ph) = self.main_window.get_size()
-            #    self.main_window.move(x + w/2 - pw/2, y + h/2 - ph/2)
 
     def _on_window_state_event_iconified(self, widget, event):
         if event.new_window_state & Gdk.WindowState.ICONIFIED:
