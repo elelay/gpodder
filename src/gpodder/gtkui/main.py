@@ -3298,7 +3298,7 @@ class gPodder(BuilderWidget, dbus.service.Object):
         self.update_downloads_list()
 
     def on_item_cancel_download_activate(self, widget):
-        if self.wNotebook.get_current_page() == 0:
+        if self.wNotebook.get_visible_child_name() == "podcasts":
             selection = self.treeAvailable.get_selection()
             (model, paths) = selection.get_selected_rows()
             urls = [model.get_value(model.get_iter(path), \
@@ -3325,19 +3325,18 @@ class gPodder(BuilderWidget, dbus.service.Object):
     def on_key_press(self, widget, event):
         # Allow tab switching with Ctrl + PgUp/PgDown/Tab
         if event.get_state() & Gdk.ModifierType.CONTROL_MASK:
-            if event.keyval == Gdk.KEY_Page_Up:
-                self.wNotebook.prev_page()
+            current_child = self.wNotebook.get_visible_child()
+            children = self.wNotebook.get_children()
+            current_page = children.index(current_child)
+            if event.keyval in (Gdk.KEY_Page_Up,  Gdk.KEY_ISO_Left_Tab):
+                if current_page == 0:
+                    current_page = len(children)
+                self.wNotebook.set_visible_child(children[current_page - 1])
                 return True
-            elif event.keyval == Gdk.KEY_Page_Down:
-                self.wNotebook.next_page()
-                return True
-            elif event.keyval == Gdk.KEY_Tab:
-                current_page = self.wNotebook.get_current_page()
-
-                if current_page == self.wNotebook.get_n_pages()-1:
-                    self.wNotebook.set_visible_child(self.channelPaned)
-                else:
-                    self.wNotebook.next_page()
+            elif event.keyval in (Gdk.KEY_Page_Down, Gdk.KEY_Tab):
+                if current_page == len(children) - 1:
+                    current_page = -1
+                self.wNotebook.set_visible_child(children[current_page + 1])
                 return True
 
         return False

@@ -658,6 +658,7 @@
                   </object>
                   <packing>
                     <property name="title" translatable="yes">Podcasts</property>
+                    <property name="name">podcasts</property>
                   </packing>
                 </child>
                 <child>
@@ -804,6 +805,7 @@
                   </object>
                   <packing>
                     <property name="title" translatable="yes">Progress</property>
+                    <property name="name">progress</property>
                   </packing>
                 </child>
               </object>
