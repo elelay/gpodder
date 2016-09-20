@@ -95,9 +95,10 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHPaned" id="hpaned">
+          <object class="GtkPaned" id="hpaned">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="orientation">horizontal</property>
             <child>
               <object class="GtkScrolledWindow" id="sw_providers">
                 <property name="visible">True</property>

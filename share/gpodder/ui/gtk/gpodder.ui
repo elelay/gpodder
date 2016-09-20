@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--*- mode: xml -*-->
 <interface>
-  <!-- interface-requires gtk+ 3.8 -->
+  <!-- interface-requires gtk+ 3.10 -->
   <object class="GtkAdjustment" id="adjustment1">
     <property name="upper">10240</property>
     <property name="lower">0.5</property>
@@ -427,47 +427,47 @@
             <property name="pack-type">start</property>
           </packing>
         </child>
-                            <child>
-                              <object class="GtkBox" id="hboxUpdateFeeds">
-                                <property name="homogeneous">False</property>
-                                <property name="spacing">6</property>
-                                <property name="orientation">horizontal</property>
-                                <child>
-                                  <object class="GtkProgressBar" id="pbFeedUpdate">
-                                    <property name="pulse_step">0.10000000149</property>
-                                    <property name="ellipsize">PANGO_ELLIPSIZE_MIDDLE</property>
-                                  </object>
-                                  <packing>
-                                    <property name="min-horizontal-bar-height">50</property>
-                                    <property name="padding">0</property>
-                                    <property name="expand">True</property>
-                                    <property name="fill">True</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkButton" id="btnCancelFeedUpdate">
-                                    <property name="can_focus">True</property>
-                                    <property name="focus_on_click">True</property>
-                                    <signal handler="on_btnCancelFeedUpdate_clicked" name="clicked"/>
-                                    <child>
-                                      <object class="GtkImage" id="image3209">
-                                        <property name="visible">True</property>
-                                        <property name="stock">gtk-cancel</property>
-                                        <property name="icon_size">4</property>
-                                      </object>
-                                    </child>
-                                  </object>
-                                  <packing>
-                                    <property name="padding">0</property>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                  </packing>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="pack-type">start</property>
-                              </packing>
-                            </child>
+        <child>
+          <object class="GtkBox" id="hboxUpdateFeeds">
+            <property name="homogeneous">False</property>
+            <property name="spacing">6</property>
+            <property name="orientation">horizontal</property>
+            <child>
+              <object class="GtkProgressBar" id="pbFeedUpdate">
+                <property name="pulse_step">0.10000000149</property>
+                <property name="ellipsize">PANGO_ELLIPSIZE_MIDDLE</property>
+              </object>
+              <packing>
+                <property name="min-horizontal-bar-height">50</property>
+                <property name="padding">0</property>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btnCancelFeedUpdate">
+                <property name="can_focus">True</property>
+                <property name="focus_on_click">True</property>
+                <signal handler="on_btnCancelFeedUpdate_clicked" name="clicked"/>
+                <child>
+                  <object class="GtkImage" id="image3209">
+                    <property name="visible">True</property>
+                    <property name="stock">gtk-cancel</property>
+                    <property name="icon_size">4</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="pack-type">start</property>
+          </packing>
+        </child>
         <child>
           <object class="GtkMenuButton" id="buttonMenu">
             <property name="visible">True</property>
@@ -512,10 +512,11 @@
                 <property name="can_focus">True</property>
                 <!--<signal handler="on_wNotebook_switch_page" name="switch_page"/>-->
                 <child>
-                  <object class="GtkHPaned" id="channelPaned">
+                  <object class="GtkPaned" id="channelPaned">
                     <property name="border_width">0</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="orientation">horizontal</property>
                     <child>
                       <object class="GtkBox" id="vboxChannelNavigator">
                         <property name="visible">True</property>
