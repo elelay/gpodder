@@ -59,7 +59,7 @@ else:
             if not message and not title:
                 return
 
-            notify = Notify.Notification(title or '', message or '',
+            notify = Notify.Notification.new(title or '', message or '',
                     gpodder.icon_file)
 
             try:
