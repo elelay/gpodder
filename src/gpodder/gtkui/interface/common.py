@@ -98,7 +98,6 @@ class BuilderWidget(GtkBuilderWidget):
         dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
         dialog.add_button(affirmative_text, Gtk.ResponseType.OK)
 
-        dialog.set_has_separator(False)
         dialog.set_default_size(300, -1)
         dialog.set_default_response(Gtk.ResponseType.OK)
 
@@ -116,16 +115,16 @@ class BuilderWidget(GtkBuilderWidget):
             if text is None:
                 dialog.set_response_sensitive(Gtk.ResponseType.OK, False)
 
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.set_border_width(10)
         hbox.set_spacing(10)
-        hbox.pack_start(Gtk.Label(prompt, True, True, 0), False, False)
-        hbox.pack_start(text_entry, True, True)
-        dialog.vbox.pack_start(hbox, True, True)
+        hbox.pack_start(Gtk.Label(prompt, True, True, 0), False, False, 0)
+        hbox.pack_start(text_entry, True, True, 0)
+        dialog.vbox.pack_start(hbox, True, True, 0)
 
         dialog.show_all()
         response = dialog.run()
-        result = text_entry.get_text()
+        result = unicode(text_entry.get_text(), 'utf8')
         dialog.destroy()
 
         if response == Gtk.ResponseType.OK:
