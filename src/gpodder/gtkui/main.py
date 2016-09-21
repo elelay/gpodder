@@ -3180,6 +3180,7 @@ class gPodder(BuilderWidget, dbus.service.Object):
         dlg.run()
 
     def on_wNotebook_switch_page(self, notebook, page, page_num):
+        """ DEAD CODE """
         if page_num == 0:
             self.play_or_download()
             # The message area in the downloads tab should be hidden
