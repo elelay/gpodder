@@ -177,6 +177,7 @@ class gPodderPreferences(BuilderWidget):
     C_TOGGLE, C_LABEL, C_EXTENSION, C_SHOW_TOGGLE = range(4)
 
     def new(self):
+        print("new gPodderPreferences")
         for cb in (self.combo_audio_player_app, self.combo_video_player_app):
             cellrenderer = Gtk.CellRendererPixbuf()
             cb.pack_start(cellrenderer, False)
@@ -292,6 +293,7 @@ class gPodderPreferences(BuilderWidget):
 
         # Configure the extensions manager GUI
         self.set_extension_preferences()
+        self.main_window.show()
 
     def set_extension_preferences(self):
         def search_equal_func(model, column, key, it):
