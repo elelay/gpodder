@@ -1060,7 +1060,7 @@ class gPodder(BuilderWidget, dbus.service.Object):
         else:
             raise Exception('on_treeview_expose_event: unknown role')
 
-        draw_text_box_centered(ctx, treeview, width, height, text, None, None)
+        draw_text_box_centered(ctx, treeview, width, height, text)
         return True
 
     def enable_download_list_update(self):
